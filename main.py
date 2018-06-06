@@ -4,6 +4,7 @@ import json
 from datetime import datetime
 import re
 import queue
+import os
 import threading
 
 
@@ -47,6 +48,7 @@ def longpollserver():
 
 
 if __name__ == '__main__':
+
     log_print('Запуск longpoll потока ...')
     thread_longpoll = threading.Thread(target=longpollserver)
     thread_longpoll.start()
@@ -55,4 +57,6 @@ if __name__ == '__main__':
     while True:
         time.sleep(10 / 1000000.0)
         update = updates_queue.get()
-        print(update)
+        if 'message' in update:
+            msg = update['message']
+            msg 
