@@ -37,7 +37,7 @@ if __name__ == '__main__':
             update = updates_queue.get()
             if 'message' in update:
                 msg = update['message']
-                print('Recieved message №' + str(msg['message_id']))
+                print('MsgID#' + str(msg['message_id']) + ' Начало обработки запроса')
                 threading.Thread(target=handler.handle_msg, args=(msg,)).start()
     except KeyboardInterrupt:
         os._exit(0)
