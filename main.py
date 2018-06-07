@@ -8,7 +8,7 @@ import os
 import threading
 
 
-TG_TOKEN = '559554306:AAHtWdl0uFMavh7LTCF_r40rMeF3eU0x0Zg'
+TG_TOKEN = json.loads(open('./config.json').read())['token']
 
 updates_queue = queue.Queue()
 
