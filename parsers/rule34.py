@@ -1,24 +1,38 @@
 import untangle, random, requests
 def rule34(req):
+    print(req)
     try:
         try:
-            req = req.replace(' ','+')
-            blacklist = '-fur+-pony*+-friendship*+-scat*+-furry+-dragon+-guro+-animal_penis+-animal+-wolf+-fox+-webm+-my_little_pony+-monster*+-3d+-animal*+-ant+-insects+-mammal+-horse+-blotch+-deer+-real*+-shit+-everlasting_summer+-copro*+-wtf+'
-            parse = untangle.parse('http://0s.oj2wyzjtgqxhq6dy.cmle.ru/index.php?page=dapi&s=post&q=index&limit=100&tags='+blacklist+req)
-            randnum = random.randint(0,len(parse.posts.post))
-            file_url = parse.posts.post[randnum]['file_url']
-            tags = parse.posts.post[randnum]['tags'].split(' ')
-            if file_url.find('img.rule34')<0:
-                file_url = file_url.replace('rule34.xxx','0s.oj2wyzjtgqxhq6dy.cmle.ru')
-                file_url = file_url.replace('https','http')
-            else:
-                file_url = file_url.replace('img.rule34.xxx','nfwwo.oj2wyzjtgqxhq6dy.cmle.ru')
-                file_url = file_url.replace('https','http')
-                pic = requests.get(file_url).content
-            return [{"type":"photo", "from":"rule34.xxx", "photo":pic, "tags": tags}]
-            #return [{"type":"hentai", "from":"rule34.xxx", "photo":"тут картинка", "tags": tags}]
+            tor = {
+                'http': 'socks5://127.0.0.1:9050',
+                'https': 'socks5://127.0.0.1:9050'
+            }
+            r = requests.post('http://rule34.xxx/index.php',
+                params={
+                    'page': 'dapi',
+                    's': 'post',
+                    'q': 'index',
+                    'limit': '100',
+                    'tags': ' '.join(req)
+                },
+                proxies=tor)
+            parse = untangle.parse(r.text)
+            #randnum = random.randint(0,len(parse.posts.post))
+            ret = []
+            for r34_c in range(len(parse.posts.post)):
+                file_url = parse.posts.post[r34_c]['file_url']
+                tags = parse.posts.post[r34_c]['tags'].split(' ')
+                # pic = requests.get(file_url).content
+                file_type = file_url.split('.')[-1]
+                if file_type in ('jpeg', 'png', 'jpg'):
+                    ret.append({"type": "photo", "from": "rule34.xxx", "photo": file_url, "tags": tags})
+                elif file_type == 'gif':
+                    ret.append({"type": "gif", "from": "rule34.xxx", "gif": file_url, "tags": tags})
+                elif file_type == 'video':
+                    ret.append({"type": "video", "from": "rule34.xxx", "video": file_url, "tags": tags})
+                # ret.append([{"type":"hentai", "from":"rule34.xxx", "photo":file_url, "tags": tags}])
+            return ret
         except UnicodeEncodeError:
-                return [{"type":"error", "from":"rule34.xxx", "text":"Ничего не найдено"}]
+            return [{"type":"error", "from":"rule34.xxx", "text":"Ничего не найдено"}]
     except AttributeError:
         return [{"type":"error", "from":"rule34.xxx", "text":"Ничего не найдено"}]
-print(rule34('saber'))

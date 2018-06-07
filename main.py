@@ -1,43 +1,21 @@
-import requests
 import time
-import json
-from datetime import datetime
-import re
 import queue
-import os
 import threading
+import kbotlib
+import handler
+import os
 
-
-TG_TOKEN = json.loads(open('./config.json').read())['token']
 
 updates_queue = queue.Queue()
 
 
-def log_print(text, type='info'):
-    print('[' + datetime.now().strftime("%H:%M:%S") + '] ' + text)
-
-
-def tg_api(method, parameters={}, token=TG_TOKEN, file=None):
-    url = 'https://api.telegram.org/bot' + token + '/' + method
-    headers = {}
-
-    #if method.split('.')[1][:3] == 'get':
-    if file == None:
-        r = requests.post(url, params=parameters, headers=headers)
-    else:
-        r = requests.post(url, params=parameters, headers=headers, files={'file': file})
-    # print(r.text)
-    return r.json()
-
-
 def longpollserver():
-    res = tg_api('getUpdates', parameters={'offset': -1})
-    last_update_id = res['result'][-1]['update_id']
+    last_update_id = 0
 
     while True:
         time.sleep(10 / 1000000.0)
 
-        res = tg_api('getUpdates', parameters={'offset': last_update_id + 1})
+        res = kbotlib.tg_api('getUpdates', parameters={'timeout': 100,'offset': last_update_id + 1})
         if res['result'] == []:
             continue
 
@@ -49,14 +27,17 @@ def longpollserver():
 
 if __name__ == '__main__':
 
-    log_print('Запуск longpoll потока ...')
+    kbotlib.log_print('Запуск longpoll потока ...')
     thread_longpoll = threading.Thread(target=longpollserver)
     thread_longpoll.start()
-    log_print('Longpoll поток запущен.')
-
-    while True:
-        time.sleep(10 / 1000000.0)
-        update = updates_queue.get()
-        if 'message' in update:
-            msg = update['message']
-            msg 
+    kbotlib.log_print('Longpoll поток запущен.')
+    try:
+        while True:
+            time.sleep(10 / 1000000.0)
+            update = updates_queue.get()
+            if 'message' in update:
+                msg = update['message']
+                print('Recieved message №' + str(msg['message_id']))
+                threading.Thread(target=handler.handle_msg, args=(msg,)).start()
+    except KeyboardInterrupt:
+        os._exit(0)
