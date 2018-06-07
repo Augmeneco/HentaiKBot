@@ -19,13 +19,41 @@ def handle_msg(msg):
 
     print(msg['tags'])
 
-    if '/hentai' in msg['command']:
+    if list([s for s in msg['tags'] if '!p_' in s]) != []:
+        pid = list([s for s in msg['tags'] if '!p_' in s])[0]
+        msg['tags'].remove(pid)
+        pid = int(pid[3:])
+    else:
+        pid = None
+
+    if '/help' in msg['command']:
+        page = '[ Помощь HentaiKBot ]\n\
+/hentai <tags> - Поиск хентая по заданным вами тегам\n\
+/animeart <tags> - Поиск аниме артов по заданным вами тегам\n\
+/eromanga <tags> - Поиск эроманги по заданным тегам\n\
+/help - Справка по использованию бота\n\
+\n\
+Памятка по тегам\n\
+  - Теги пишутся через пробел\n\
+  - Теги можно не писать. Тогда выберутся случайные материалы\n\
+  - Служебные теги бота начинаются с знака "!"\n\
+  Служебные теги:\n\
+      !p_<page id> - смотреть на странице номер\n\
+      !rtrd - убрать цензуру (/hentai)'
+
+        kbotlib.tg_api('sendMessage', {
+            'chat_id': msg['chat']['id'],
+            'text': page,
+            'reply_to_message_id': msg['message_id']
+        })
+
+    elif '/hentai' in msg['command']:
         if '!rtrd' not in msg['tags']:
             msg['tags'].extend(TAGS_BLACKLIST)
         else:
             msg['tags'].remove('!rtrd')
 
-        result = parsers.rule34.rule34(msg['tags'])
+        result = parsers.rule34.rule34(msg['tags'], pid)
 
         random.shuffle(result)
 
@@ -67,7 +95,7 @@ def handle_msg(msg):
             })
 
     elif '/animeart' in msg['command']:
-        result = parsers.booru.booru(msg['tags'])
+        result = parsers.booru.booru(msg['tags'], pid)
 
         random.shuffle(result)
 

@@ -1,11 +1,28 @@
 import untangle, random, requests
-def booru(req):
+def booru(req, pid=None):
+    # if pid is None:
+    #     print(0)
+    #     r = requests.post('http://safebooru.org/index.php',
+    #         params={
+    #             'page': 'dapi',
+    #             's': 'post',
+    #             'q': 'index',
+    #             'limit': '100',
+    #             'pid': 0,
+    #             'tags': ' '.join(req)
+    #         })
+    #     parse = untangle.parse(r.text)
+    #     pid = int(random.randint(0, int(parse.posts['count'])) / 100)
+
+    pid = 0
+    
     r = requests.post('http://safebooru.org/index.php',
         params={
             'page': 'dapi',
             's': 'post',
             'q': 'index',
             'limit': '100',
+            'pid': pid,
             'tags': ' '.join(req)
         })
     parse = untangle.parse(r.text)

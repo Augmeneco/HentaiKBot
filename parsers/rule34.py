@@ -1,15 +1,34 @@
 import untangle, random, requests
-def rule34(req):
+def rule34(req, pid=None):
     tor = {
         'http': 'socks5://127.0.0.1:9050',
         'https': 'socks5://127.0.0.1:9050'
     }
+
+    # if pid is None:
+    #     r = requests.post('http://rule34.xxx/index.php',
+    #         params={
+    #             'page': 'dapi',
+    #             's': 'post',
+    #             'q': 'index',
+    #             'limit': '100',
+    #             'pid': 0,
+    #             'tags': ' '.join(req)
+    #         },
+    #         proxies=tor)
+    #     parse = untangle.parse(r.text)
+    #     pid = int(random.randint(0, int(parse.posts['count'])) / 100)
+
+    pid = 0
+
     r = requests.post('http://rule34.xxx/index.php',
         params={
             'page': 'dapi',
             's': 'post',
             'q': 'index',
             'limit': '100',
+            'deleted':'show',
+            'pid': pid,
             'tags': ' '.join(req)
         },
         proxies=tor)
