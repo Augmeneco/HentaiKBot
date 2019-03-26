@@ -2,7 +2,7 @@ import re
 import kbotlib
 import json
 import random
-# parsers
+#  parsers
 import parsers.rule34
 import parsers.booru
 

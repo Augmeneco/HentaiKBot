@@ -1,6 +1,6 @@
 import untangle, random, requests
 def booru(req, pid=None):
-    # if pid is None:
+    # if pid is  None:
     #     print(0)
     #     r = requests.post('http://safebooru.org/index.php',
     #         params={

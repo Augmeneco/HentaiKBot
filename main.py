@@ -13,7 +13,7 @@ def longpollserver():
     last_update_id = 0
 
     while True:
-        time.sleep(10 / 1000000.0)
+        time.sleep(10/ 1000000.0)
 
         res = kbotlib.tg_api('getUpdates', parameters={'timeout': 100,'offset': last_update_id + 1})
         if res['result'] == []:
